@@ -1,14 +1,16 @@
 package com.kanini.loanproduct.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = false, exclude = {"productInformation"})
+@ToString(exclude={"productInformation"})
 @Table(name="loan_amount")
 
 public class LoanAmount {
@@ -35,6 +37,8 @@ public class LoanAmount {
 
     @OneToOne
     @JoinColumn(name="product_id")
+    @MapsId
+    @JsonBackReference
     private ProductInformation productInformation;
 }
 

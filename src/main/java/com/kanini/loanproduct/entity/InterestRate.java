@@ -1,15 +1,17 @@
 package com.kanini.loanproduct.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.repository.cdi.Eager;
+import lombok.*;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
+@EqualsAndHashCode(callSuper = false, exclude = {"productInformation"})
+@ToString(exclude={"productInformation"})
 @Table(name="interest_rate")
 public class InterestRate {
 
@@ -47,5 +49,7 @@ public class InterestRate {
 
     @OneToOne
     @JoinColumn(name="product_id")
+    @MapsId
+    @JsonBackReference
     private ProductInformation productInformation;
 }

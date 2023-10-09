@@ -7,4 +7,6 @@ import java.util.List;
 public interface ProductInformationService {
 
     List<ProductInformation> getAllDetails();
+
+    public void createProduct(ProductInformation productInformation);
 }

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false, exclude = {"productAvailability"})
-@ToString(exclude = {"productAvailability"})
+@EqualsAndHashCode(callSuper = false, exclude = {"productAvailability","LoanAmount,AccountSettings","InterestRate","Repayments"})
+@ToString(exclude = {"productAvailability","LoanAmount,AccountSettings","InterestRate","Repayments"})
 @Table(name="product_info")
 public class ProductInformation {
     @Id
@@ -43,15 +43,19 @@ public class ProductInformation {
     @PrimaryKeyJoinColumn
     private ProductAvailability productAvailability;
 
-//    @OneToOne(mappedBy = "productInformation")
-//    private AccountSettings accountSettings;
-//
-//    @OneToOne(mappedBy = "productInformation")
-//    private LoanAmount loanAmount;
-//
-//    @OneToOne(mappedBy = "productInformation")
-//    private InterestRate interestRate;
-//
-//    @OneToOne(mappedBy = "productInformation")
-//    private Repayments repayments;
+    @OneToOne(mappedBy = "productInformation", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private AccountSettings accountSettings;
+
+    @OneToOne(mappedBy = "productInformation", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private LoanAmount loanAmount;
+
+    @OneToOne(mappedBy = "productInformation", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private InterestRate interestRate;
+
+    @OneToOne(mappedBy = "productInformation", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Repayments repayments;
 }

@@ -2,6 +2,7 @@ package com.kanini.loanproduct.controller;
 
 import com.kanini.loanproduct.entity.ProductAvailability;
 import com.kanini.loanproduct.entity.ProductInformation;
+import com.kanini.loanproduct.repository.ProductAvailabilityRepo;
 import com.kanini.loanproduct.service.ProductInformationService;
 import com.kanini.loanproduct.service.impl.ProductInformationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +19,19 @@ public class LoanProductController {
 
     @Autowired
     private ProductInformationService productInformationService;
+    @Autowired
+    private ProductAvailabilityRepo productAvailabilityRepo;
 
     @GetMapping("/productdetails")
-    public List<ProductInformation>getAllDetails(){
+    public List<ProductInformation> getAllDetails(){
         return productInformationService.getAllDetails();
     }
 
+
+
     @PostMapping("/createproduct")
-    public ResponseEntity<ProductInformation> createProductWithAvailability(
-            @RequestBody ProductInformation productInformation,
-            @RequestBody ProductAvailability productAvailability)
-    {
-       // productInformationService.createProductWithAvailability(productInformation,productAvailability);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createProduct(@RequestBody ProductInformation productInformation){
+         productInformationService.createProduct(productInformation);
     }
 }

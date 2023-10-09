@@ -19,17 +19,18 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     @Autowired
     private ProductAvailabilityRepo productAvailabilityRepo;
 
-    public List<ProductInformation> getAllDetails(){
+    public List<ProductInformation> getAllDetails() {
         List<ProductInformation> productInformations = null;
         productInformations = productInformationRepo.findAll();
         return productInformations;
     }
-@Transactional
-    public void createProductWithAvailability(ProductInformation productInformation, ProductAvailability productAvailability){
-       // productInformation.setProductAvailability(productAvailability);
-      //  productAvailability.setProductInformation(productInformation);
+
+    @Transactional
+    public void createProduct(ProductInformation productInformation) {
+        ProductAvailability productAvailability = productInformation.getProductAvailability();
+        productAvailability.setProductInformation(productInformation);
         productInformationRepo.save(productInformation);
-        productAvailabilityRepo.save(productAvailability);
+
     }
 
 }
