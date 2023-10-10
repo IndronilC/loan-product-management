@@ -9,4 +9,7 @@ public interface ProductInformationService {
     List<ProductInformation> getAllDetails();
 
     public void createProduct(ProductInformation productInformation);
+    public void deleteProduct(int productId);
+
+    public ProductInformation updateProduct(ProductInformation productInformation,int productId);
 }

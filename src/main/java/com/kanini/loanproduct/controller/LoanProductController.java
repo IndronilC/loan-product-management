@@ -1,37 +1,40 @@
 package com.kanini.loanproduct.controller;
 
-import com.kanini.loanproduct.entity.ProductAvailability;
 import com.kanini.loanproduct.entity.ProductInformation;
-import com.kanini.loanproduct.repository.ProductAvailabilityRepo;
 import com.kanini.loanproduct.service.ProductInformationService;
-import com.kanini.loanproduct.service.impl.ProductInformationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/loanproduct")
+@RequestMapping("/loanProduct")
 public class LoanProductController {
 
     @Autowired
     private ProductInformationService productInformationService;
-    @Autowired
-    private ProductAvailabilityRepo productAvailabilityRepo;
 
-    @GetMapping("/productdetails")
-    public List<ProductInformation> getAllDetails(){
+    @GetMapping("/products")
+    public List<ProductInformation> getAllDetails() {
         return productInformationService.getAllDetails();
     }
 
 
-
     @PostMapping("/createproduct")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@RequestBody ProductInformation productInformation){
-         productInformationService.createProduct(productInformation);
+    public void createProduct(@RequestBody ProductInformation productInformation) {
+        productInformationService.createProduct(productInformation);
+    }
+
+    @DeleteMapping("/deleteproduct/{productId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void deleteProduct(@PathVariable int productId) {
+        productInformationService.deleteProduct(productId);
+    }
+
+    @PutMapping("/updateproduct/{productId}")
+    public ProductInformation updateProduct(@RequestBody ProductInformation productInformation, @PathVariable int productId) {
+        return productInformationService.updateProduct(productInformation, productId);
     }
 }
