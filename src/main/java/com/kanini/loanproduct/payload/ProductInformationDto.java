@@ -1,5 +1,7 @@
 package com.kanini.loanproduct.payload;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kanini.loanproduct.entity.LoanAmount;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +24,14 @@ public class ProductInformationDto {
     private String productDescription;
     private Boolean status;
     LocalDate lastModified= LocalDateTime.now().toLocalDate();
+    @JsonProperty("productAvailability")
+    private ProductAvailabilityDto productAvailabilityDto;
+    @JsonProperty("loanAmount")
+    private LoanAmountDto loanAmountDto;
+    @JsonProperty("interestRate")
+    private InterestRateDto interestRateDto;
+    @JsonProperty("repayments")
+    private RepaymentsDto repaymentsDto;
+    @JsonProperty("accountSettings")
+    private AccountSettingsDto accountSettingsDto;
 }
