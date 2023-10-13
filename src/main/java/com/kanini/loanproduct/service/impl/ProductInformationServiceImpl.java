@@ -5,6 +5,7 @@ import com.kanini.loanproduct.payload.ProductInformationDto;
 import com.kanini.loanproduct.repository.ProductAvailabilityRepo;
 import com.kanini.loanproduct.repository.ProductInformationRepo;
 import com.kanini.loanproduct.service.ProductInformationService;
+import com.kanini.loanproduct.service.exception.LoanProductBusinessException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -116,11 +118,11 @@ public class ProductInformationServiceImpl implements ProductInformationService 
         productAvailability.setProductInformation(productInformation);
         LoanAmount loanAmount = productInformation.getLoanAmount();
         loanAmount.setProductInformation(productInformation);
-        AccountSettings accountSettings= productInformation.getAccountSettings();
+        AccountSettings accountSettings = productInformation.getAccountSettings();
         accountSettings.setProductInformation(productInformation);
-        InterestRate interestRate= productInformation.getInterestRate();
+        InterestRate interestRate = productInformation.getInterestRate();
         interestRate.setProductInformation(productInformation);
-        Repayments repayments= productInformation.getRepayments();
+        Repayments repayments = productInformation.getRepayments();
         repayments.setProductInformation(productInformation);
     }
 
@@ -130,20 +132,27 @@ public class ProductInformationServiceImpl implements ProductInformationService 
         log.info("Loan Product Details Has Been Deleted Successfully ");
     }
 
+    /**
+     * <p>This method <code>updateProduct</code> has been refactored to ensure that the
+     * current code follows the Java 8 nuances to call the
+     * <code>productInformationRepo.findById(productId)</code></p> method and the code of this
+     * method has modularization to gain horizontal and vertical readability along with
+     * distribution of responsibility through the
+     * <code>private void setLoadProductRelationship(ProductInformation productInformation)</code>
+     * and <code>private void setLoadProductRelationship(ProductInformation productInformation)</code>
+     */
     @Transactional
     public ProductInformation updateProduct(ProductInformation productInformation, int productId) {
-        ProductInformation existProductInformation = productInformationRepo.findById(productId).orElse(null);
-        existProductInformation.setProductId(productId);
-        existProductInformation.setProductName(productInformation.getProductName());
-        existProductInformation.setProductType(productInformation.getProductType());
-        existProductInformation.setProductCategory(productInformation.getProductType());
-        existProductInformation.setProductDescription(productInformation.getProductDescription());
-        existProductInformation.setStatus(productInformation.getStatus());
-        existProductInformation.setProductAvailability(productInformation.getProductAvailability());
-        existProductInformation.setAccountSettings(productInformation.getAccountSettings());
-        existProductInformation.setInterestRate(productInformation.getInterestRate());
-        existProductInformation.setRepayments(productInformation.getRepayments());
-        existProductInformation.setLoanAmount(productInformation.getLoanAmount());
+        Optional<ProductInformation> existProductInformationData = Optional.ofNullable(productInformationRepo.findById(productId)
+                .orElseThrow(() -> new LoanProductBusinessException("Loan Product Not Found", new NullPointerException())));
+        ProductInformation existProductInformation = getProductInformation
+                (productInformation, productId, existProductInformationData);
+        setLoadProductRelationship(productInformation);
+        log.info("Loan product Details Has Been Updated Successfully");
+        return productInformationRepo.save(existProductInformation);
+    }
+
+    private void setLoadProductRelationship(ProductInformation productInformation) {
         ProductAvailability productAvailability = productInformation.getProductAvailability();
         AccountSettings accountSettings = productInformation.getAccountSettings();
         InterestRate interestRate = productInformation.getInterestRate();
@@ -154,7 +163,27 @@ public class ProductInformationServiceImpl implements ProductInformationService 
         interestRate.setProductInformation(productInformation);
         loanAmount.setProductInformation(productInformation);
         repayments.setProductInformation(productInformation);
-        log.info("Loan product Details Has Been Updated Successfully");
-        return productInformationRepo.save(existProductInformation);
+    }
+
+    private ProductInformation getProductInformation(
+            ProductInformation productInformation,
+            int productId,
+            Optional<ProductInformation> existProductInformationData) {
+        ProductInformation existProductInformation = null;
+        if (existProductInformationData.isPresent()) {
+            existProductInformation = existProductInformationData.get();
+            existProductInformation.setProductId(productId);
+            existProductInformation.setProductName(productInformation.getProductName());
+            existProductInformation.setProductType(productInformation.getProductType());
+            existProductInformation.setProductCategory(productInformation.getProductType());
+            existProductInformation.setProductDescription(productInformation.getProductDescription());
+            existProductInformation.setStatus(productInformation.getStatus());
+            existProductInformation.setProductAvailability(productInformation.getProductAvailability());
+            existProductInformation.setAccountSettings(productInformation.getAccountSettings());
+            existProductInformation.setInterestRate(productInformation.getInterestRate());
+            existProductInformation.setRepayments(productInformation.getRepayments());
+            existProductInformation.setLoanAmount(productInformation.getLoanAmount());
+        }
+        return existProductInformation;
     }
 }
