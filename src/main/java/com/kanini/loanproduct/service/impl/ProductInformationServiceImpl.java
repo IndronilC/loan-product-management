@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,68 +25,9 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     @Autowired
     private ProductInformationRepo productInformationRepo;
     @Autowired
-    private ProductAvailabilityRepo productAvailabilityRepo;
-    @Autowired
     private ModelMapper modelMapper;
 
-    //    public List<ProductInformation> getAllDetails() {
-//        List<ProductInformation> productInformations = null;
-//        productInformations = productInformationRepo.findAll();
-//        log.info("Loan Product Details Has Been Executed Successfully");
-//        return productInformations;
-//    }
-//
-//
-//    @Transactional
-//    public void createProduct(ProductInformation productInformation) {
-//        ProductAvailability productAvailability = productInformation.getProductAvailability();
-//        AccountSettings accountSettings = productInformation.getAccountSettings();
-//        InterestRate interestRate = productInformation.getInterestRate();
-//        LoanAmount loanAmount = productInformation.getLoanAmount();
-//        Repayments repayments = productInformation.getRepayments();
-//        productAvailability.setProductInformation(productInformation);
-//        accountSettings.setProductInformation(productInformation);
-//        interestRate.setProductInformation(productInformation);
-//        loanAmount.setProductInformation(productInformation);
-//        repayments.setProductInformation(productInformation);
-//        productInformationRepo.save(productInformation);
-//        log.info("Loan product Details Has Been Created Successfully");
-//
-//    }
-//
-//    public void deleteProduct(int productId) {
-//        ProductInformation productInformation = productInformationRepo.findById(productId).orElse(null);
-//        productInformationRepo.delete(productInformation);
-//        log.info("Loan Product Details Has Been Deleted Successfully ");
-//    }
-//
-//    @Transactional
-//    public ProductInformation updateProduct(ProductInformation productInformation, int productId) {
-//        ProductInformation existProductInformation = productInformationRepo.findById(productId).orElse(null);
-//        existProductInformation.setProductId(productId);
-//        existProductInformation.setProductName(productInformation.getProductName());
-//        existProductInformation.setProductType(productInformation.getProductType());
-//        existProductInformation.setProductCategory(productInformation.getProductType());
-//        existProductInformation.setProductDescription(productInformation.getProductDescription());
-//        existProductInformation.setStatus(productInformation.getStatus());
-//        existProductInformation.setProductAvailability(productInformation.getProductAvailability());
-//        existProductInformation.setAccountSettings(productInformation.getAccountSettings());
-//        existProductInformation.setInterestRate(productInformation.getInterestRate());
-//        existProductInformation.setRepayments(productInformation.getRepayments());
-//        existProductInformation.setLoanAmount(productInformation.getLoanAmount());
-//        ProductAvailability productAvailability = productInformation.getProductAvailability();
-//        AccountSettings accountSettings = productInformation.getAccountSettings();
-//        InterestRate interestRate = productInformation.getInterestRate();
-//        LoanAmount loanAmount = productInformation.getLoanAmount();
-//        Repayments repayments = productInformation.getRepayments();
-//        productAvailability.setProductInformation(productInformation);
-//        accountSettings.setProductInformation(productInformation);
-//        interestRate.setProductInformation(productInformation);
-//        loanAmount.setProductInformation(productInformation);
-//        repayments.setProductInformation(productInformation);
-//        log.info("Loan product Details Has Been Updated Successfully");
-//        return productInformationRepo.save(existProductInformation);
-//    }
+
     public List<ProductInformationDto> getAllDetails() {
         List<ProductInformation> productInformations = productInformationRepo.findAll();
         List<ProductInformationDto> productInformationDtos = productInformations.stream().map(productInformation ->
@@ -147,43 +89,81 @@ public class ProductInformationServiceImpl implements ProductInformationService 
                 .orElseThrow(() -> new LoanProductBusinessException("Loan Product Not Found", new NullPointerException())));
         ProductInformation existProductInformation = getProductInformation
                 (productInformation, productId, existProductInformationData);
-        setLoadProductRelationship(productInformation);
         log.info("Loan product Details Has Been Updated Successfully");
         return productInformationRepo.save(existProductInformation);
     }
-
-    private void setLoadProductRelationship(ProductInformation productInformation) {
-        ProductAvailability productAvailability = productInformation.getProductAvailability();
-        AccountSettings accountSettings = productInformation.getAccountSettings();
-        InterestRate interestRate = productInformation.getInterestRate();
-        LoanAmount loanAmount = productInformation.getLoanAmount();
-        Repayments repayments = productInformation.getRepayments();
-        productAvailability.setProductInformation(productInformation);
-        accountSettings.setProductInformation(productInformation);
-        interestRate.setProductInformation(productInformation);
-        loanAmount.setProductInformation(productInformation);
-        repayments.setProductInformation(productInformation);
-    }
-
     private ProductInformation getProductInformation(
             ProductInformation productInformation,
             int productId,
             Optional<ProductInformation> existProductInformationData) {
         ProductInformation existProductInformation = null;
-        if (existProductInformationData.isPresent()) {
-            existProductInformation = existProductInformationData.get();
-            existProductInformation.setProductId(productId);
-            existProductInformation.setProductName(productInformation.getProductName());
-            existProductInformation.setProductType(productInformation.getProductType());
-            existProductInformation.setProductCategory(productInformation.getProductType());
-            existProductInformation.setProductDescription(productInformation.getProductDescription());
-            existProductInformation.setStatus(productInformation.getStatus());
-            existProductInformation.setProductAvailability(productInformation.getProductAvailability());
-            existProductInformation.setAccountSettings(productInformation.getAccountSettings());
-            existProductInformation.setInterestRate(productInformation.getInterestRate());
-            existProductInformation.setRepayments(productInformation.getRepayments());
-            existProductInformation.setLoanAmount(productInformation.getLoanAmount());
+        if (existProductInformationData.isPresent() && !Objects.isNull(productInformation)) {
+            existProductInformation = getUpdateProductInformation(productInformation, existProductInformationData);
         }
         return existProductInformation;
+    }
+
+    private ProductInformation getUpdateProductInformation(
+            ProductInformation productInformation,
+            Optional<ProductInformation> existProductInformationData) {
+        ProductInformation existProductInformation;
+        existProductInformation = existProductInformationData.get();
+        existProductInformation.setProductId(productInformation.getProductId());
+        existProductInformation.setProductName(productInformation.getProductName());
+        existProductInformation.setProductType(productInformation.getProductType());
+        existProductInformation.setProductCategory(productInformation.getProductCategory());
+        existProductInformation.setProductDescription(productInformation.getProductDescription());
+        existProductInformation.setStatus(productInformation.getStatus());
+        updateProductAvailability(productInformation, existProductInformation);
+        updateAccountSettings(productInformation, existProductInformation);
+        updateInterestRate(productInformation, existProductInformation);
+        updateRepayments(productInformation, existProductInformation);
+        updateLoanPayments(productInformation, existProductInformation);
+        return existProductInformation;
+    }
+
+    private void updateLoanPayments(
+            ProductInformation productInformation,
+            ProductInformation existProductInformation) {
+        if(Objects.nonNull(productInformation.getLoanAmount())){
+            existProductInformation.setLoanAmount(productInformation.getLoanAmount());
+            productInformation.getLoanAmount().setProductInformation(existProductInformation);
+        }
+    }
+
+    private void updateRepayments(
+            ProductInformation productInformation,
+            ProductInformation existProductInformation) {
+        if(Objects.nonNull(productInformation.getRepayments())) {
+            existProductInformation.setRepayments(productInformation.getRepayments());
+            productInformation.getRepayments().setProductInformation(existProductInformation);
+        }
+    }
+
+    private void updateInterestRate(
+            ProductInformation productInformation,
+            ProductInformation existProductInformation) {
+        if(Objects.nonNull(productInformation.getInterestRate())){
+            existProductInformation.setInterestRate(productInformation.getInterestRate());
+            productInformation.getInterestRate().setProductInformation(existProductInformation);
+        }
+    }
+
+    private void updateAccountSettings(
+            ProductInformation productInformation,
+            ProductInformation existProductInformation) {
+        if(Objects.nonNull(productInformation.getAccountSettings())){
+           existProductInformation.setAccountSettings(productInformation.getAccountSettings());
+           productInformation.getAccountSettings().setProductInformation(existProductInformation);
+        }
+    }
+
+    private void updateProductAvailability(
+            ProductInformation productInformation,
+            ProductInformation existProductInformation) {
+        if(Objects.nonNull(productInformation.getProductAvailability())){
+            existProductInformation.setProductAvailability(productInformation.getProductAvailability());
+            productInformation.getProductAvailability().setProductInformation(existProductInformation);
+        }
     }
 }

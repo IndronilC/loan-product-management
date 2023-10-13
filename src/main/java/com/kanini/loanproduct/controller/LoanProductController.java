@@ -38,6 +38,7 @@ public class LoanProductController {
     }
 
     @PutMapping("/updateproduct/{productId}")
+    @ResponseStatus(HttpStatus.OK)
     public ProductInformation updateProduct(@RequestBody ProductInformation productInformation, @PathVariable int productId) {
         return productInformationService.updateProduct(productInformation, productId);
     }
