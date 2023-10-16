@@ -108,7 +108,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
             Optional<ProductInformation> existProductInformationData) {
         ProductInformation existProductInformation;
         existProductInformation = existProductInformationData.get();
-        existProductInformation.setProductId(productInformation.getProductId());
+     //   existProductInformation.setProductId(productInformation.getProductId());
         existProductInformation.setProductName(productInformation.getProductName());
         existProductInformation.setProductType(productInformation.getProductType());
         existProductInformation.setProductCategory(productInformation.getProductCategory());
