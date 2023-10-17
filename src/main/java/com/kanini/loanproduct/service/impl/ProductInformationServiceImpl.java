@@ -1,7 +1,12 @@
 package com.kanini.loanproduct.service.impl;
 
 import com.kanini.loanproduct.entity.*;
+import com.kanini.loanproduct.payload.AccountSettingsDto;
+import com.kanini.loanproduct.payload.InterestRateDto;
+import com.kanini.loanproduct.payload.LoanAmountDto;
+import com.kanini.loanproduct.payload.ProductAvailabilityDto;
 import com.kanini.loanproduct.payload.ProductInformationDto;
+import com.kanini.loanproduct.payload.RepaymentsDto;
 import com.kanini.loanproduct.repository.ProductAvailabilityRepo;
 import com.kanini.loanproduct.repository.ProductInformationRepo;
 import com.kanini.loanproduct.service.ProductInformationService;
@@ -28,7 +33,21 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private ModelMapper modelMapper;
 
 
+    /**
+     * <p>The code<getAllDetails</code> has been updated with a log which provided
+     * the method name dynamically through Java Reflection to indicate which meethod
+     * has been called in the Service class
+     * For further information
+     *
+     * @See {https://codedamn.com/news/java/how-to-invoke-method-by-name-in-java-dynamically-using-reflection}
+     * </p>
+     */
     public List<ProductInformationDto> getAllDetails() {
+        try {
+            log.info("In {} method ", ProductInformationServiceImpl.class.getMethod("getAllDetails", null));
+        } catch (NoSuchMethodException noSuchMethodException) {
+            throw new LoanProductBusinessException(noSuchMethodException.getMessage(), noSuchMethodException);
+        }
         List<ProductInformation> productInformations = productInformationRepo.findAll();
         List<ProductInformationDto> productInformationDtos = productInformations.stream().map(productInformation ->
                 productInformationToProductInformationDto(productInformation)).collect(Collectors.toList());
@@ -43,6 +62,20 @@ public class ProductInformationServiceImpl implements ProductInformationService 
 
     public ProductInformationDto productInformationToProductInformationDto(ProductInformation productInformation) {
         ProductInformationDto productDtoDetails = this.modelMapper.map(productInformation, ProductInformationDto.class);
+        ProductAvailabilityDto productAvailabilityDto = this.modelMapper.map(
+                productInformation.getProductAvailability(), ProductAvailabilityDto.class);
+        AccountSettingsDto accountSettingsDto = this.modelMapper.map(
+                productInformation.getAccountSettings(), AccountSettingsDto.class);
+        LoanAmountDto loanAmountDto = this.modelMapper.map(
+                productInformation.getLoanAmount(), LoanAmountDto.class);
+        RepaymentsDto repaymentsDto = this.modelMapper.map(productInformation.getRepayments(), RepaymentsDto.class);
+        InterestRateDto interestRateDto = this.modelMapper.map(
+                productInformation.getInterestRate(), InterestRateDto.class);
+        productDtoDetails.setProductAvailabilityDto(productAvailabilityDto);
+        productDtoDetails.setAccountSettingsDto(accountSettingsDto);
+        productDtoDetails.setRepaymentsDto(repaymentsDto);
+        productDtoDetails.setLoanAmountDto(loanAmountDto);
+        productDtoDetails.setInterestRateDto(interestRateDto);
         return productDtoDetails;
     }
 
@@ -92,6 +125,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
         log.info("Loan product Details Has Been Updated Successfully");
         return productInformationRepo.save(existProductInformation);
     }
+
     private ProductInformation getProductInformation(
             ProductInformation productInformation,
             int productId,
@@ -124,7 +158,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private void updateLoanPayments(
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
-        if(Objects.nonNull(productInformation.getLoanAmount())){
+        if (Objects.nonNull(productInformation.getLoanAmount())) {
             existProductInformation.setLoanAmount(productInformation.getLoanAmount());
             productInformation.getLoanAmount().setProductInformation(existProductInformation);
         }
@@ -133,7 +167,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private void updateRepayments(
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
-        if(Objects.nonNull(productInformation.getRepayments())) {
+        if (Objects.nonNull(productInformation.getRepayments())) {
             existProductInformation.setRepayments(productInformation.getRepayments());
             productInformation.getRepayments().setProductInformation(existProductInformation);
         }
@@ -142,7 +176,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private void updateInterestRate(
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
-        if(Objects.nonNull(productInformation.getInterestRate())){
+        if (Objects.nonNull(productInformation.getInterestRate())) {
             existProductInformation.setInterestRate(productInformation.getInterestRate());
             productInformation.getInterestRate().setProductInformation(existProductInformation);
         }
@@ -151,8 +185,8 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private void updateAccountSettings(
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
-        if(Objects.nonNull(productInformation.getAccountSettings())){
-           AccountSettings destAccountSettings = existProductInformation.getAccountSettings();
+        if (Objects.nonNull(productInformation.getAccountSettings())) {
+            AccountSettings destAccountSettings = existProductInformation.getAccountSettings();
             AccountSettings sourceAccountSettings = productInformation.getAccountSettings();
             destAccountSettings.setAccountState(
                     sourceAccountSettings.getAccountState() != null ?
@@ -172,7 +206,7 @@ public class ProductInformationServiceImpl implements ProductInformationService 
     private void updateProductAvailability(
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
-        if(Objects.nonNull(productInformation.getProductAvailability())){
+        if (Objects.nonNull(productInformation.getProductAvailability())) {
             ProductAvailability destProductAvailability = existProductInformation.getProductAvailability();
             ProductAvailability sourceProductAvailability = productInformation.getProductAvailability();
             destProductAvailability.setProductAvailable(
