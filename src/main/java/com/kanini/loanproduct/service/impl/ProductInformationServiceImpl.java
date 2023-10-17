@@ -108,7 +108,6 @@ public class ProductInformationServiceImpl implements ProductInformationService 
             Optional<ProductInformation> existProductInformationData) {
         ProductInformation existProductInformation;
         existProductInformation = existProductInformationData.get();
-     //   existProductInformation.setProductId(productInformation.getProductId());
         existProductInformation.setProductName(productInformation.getProductName());
         existProductInformation.setProductType(productInformation.getProductType());
         existProductInformation.setProductCategory(productInformation.getProductCategory());
@@ -153,8 +152,20 @@ public class ProductInformationServiceImpl implements ProductInformationService 
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
         if(Objects.nonNull(productInformation.getAccountSettings())){
-           existProductInformation.setAccountSettings(productInformation.getAccountSettings());
-           productInformation.getAccountSettings().setProductInformation(existProductInformation);
+           AccountSettings destAccountSettings = existProductInformation.getAccountSettings();
+            AccountSettings sourceAccountSettings = productInformation.getAccountSettings();
+            destAccountSettings.setAccountState(
+                    sourceAccountSettings.getAccountState() != null ?
+                            sourceAccountSettings.getAccountState() : destAccountSettings.getAccountState());
+            destAccountSettings.setTemplate(
+                    sourceAccountSettings.getTemplate() != null ?
+                            sourceAccountSettings.getTemplate() : destAccountSettings.getTemplate());
+            destAccountSettings.setIdType(
+                    sourceAccountSettings.getIdType() != null ?
+                            sourceAccountSettings.getIdType() : destAccountSettings.getIdType());
+            destAccountSettings.setStartingFrom(
+                    sourceAccountSettings.getStartingFrom() <= 0 ?
+                            sourceAccountSettings.getStartingFrom() : destAccountSettings.getStartingFrom());
         }
     }
 
@@ -162,8 +173,14 @@ public class ProductInformationServiceImpl implements ProductInformationService 
             ProductInformation productInformation,
             ProductInformation existProductInformation) {
         if(Objects.nonNull(productInformation.getProductAvailability())){
-            existProductInformation.setProductAvailability(productInformation.getProductAvailability());
-            productInformation.getProductAvailability().setProductInformation(existProductInformation);
+            ProductAvailability destProductAvailability = existProductInformation.getProductAvailability();
+            ProductAvailability sourceProductAvailability = productInformation.getProductAvailability();
+            destProductAvailability.setProductAvailable(
+                    sourceProductAvailability.getProductAvailable() != null ?
+                            sourceProductAvailability.getProductAvailable() : destProductAvailability.getProductAvailable());
+            destProductAvailability.setBranches(
+                    sourceProductAvailability.getBranches() != null ?
+                            sourceProductAvailability.getBranches() : destProductAvailability.getBranches());
         }
     }
 }
